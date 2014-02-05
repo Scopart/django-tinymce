@@ -70,10 +70,10 @@ class TinyMCE(forms.Textarea):
         if mce_config['mode'] == 'exact':
             mce_config['elements'] = final_attrs['id']
         mce_config['strict_loading_mode'] = 1
-        
+
         # Fix for js functions
         js_functions = {}
-        for k in ('paste_preprocess','paste_postprocess'):
+        for k in ('paste_preprocess','paste_postprocess', 'file_browser_callback'):
             if k in mce_config:
                js_functions[k] = mce_config[k]
                del mce_config[k]
@@ -86,7 +86,7 @@ class TinyMCE(forms.Textarea):
         for k in js_functions:
             index = mce_json.rfind('}')
             mce_json = mce_json[:index]+', '+k+':'+js_functions[k].strip()+mce_json[index:]
-            
+
 
         html = [u'<textarea%s>%s</textarea>' % (flatatt(final_attrs), escape(value))]
         if tinymce.settings.USE_COMPRESSOR:
@@ -99,16 +99,16 @@ class TinyMCE(forms.Textarea):
             }
             compressor_json = json.dumps(compressor_config)
             html.append(u'<script type="text/javascript">tinyMCE_GZ.init(%s)</script>' % compressor_json)
-            
+
         if pos != -1:
             html.append(u'''<script type="text/javascript">
 setTimeout(function () {
     var id = '%s';
-    
+
     if (typeof(window._tinymce_inited) == 'undefined') {
         window._tinymce_inited = [];
     }
-    
+
     if (typeof(window._tinymce_inited[id]) == 'undefined') {
         window._tinymce_inited[id] = true;
     } else {
